@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
 version = parent.ext.libraryVersion
 group = parent.ext.mavenGroupId
@@ -30,66 +29,44 @@ android {
 
 dependencies { }
 
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        name = "bubbles-for-android"
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-    }
-}
+  
 
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                name 'Bubbles for Android'
-                url siteUrl
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+ 
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId = 'com.github.jaydeep911'
+                artifactId = 'bubbles-for-android'
+                version = 'v1.3.4'
+
+                pom {
+                    name = 'Bubbles for Android'
+                    description = 'Facebook Messenger like chat bubbles for Android'
+                    url = 'https://github.com/jaydeep911/bubbles-for-android'
+
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
                     }
-                }
-                developers {
-                    developer {
-                        id 'txusballesteros'
-                        name 'Txus Ballesteros'
-                        email 'txus.ballesteros@gmail.com'
+                    developers {
+                        developer {
+                            id = 'jaydeep911'
+                            name = 'Jaydeep Purohit'
+                            email = 'your-email@example.com' // optional
+                        }
                     }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
+                    scm {
+                        connection = 'scm:git:github.com/jaydeep911/bubbles-for-android.git'
+                        developerConnection = 'scm:git:ssh://github.com:jaydeep911/bubbles-for-android.git'
+                        url = 'https://github.com/jaydeep911/bubbles-for-android'
+                    }
                 }
             }
         }
     }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
 }
